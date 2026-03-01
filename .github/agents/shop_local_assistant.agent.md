@@ -1,7 +1,8 @@
 ---
 name: shop_local_assistant
-description: Helps build the shop_local website
-argument-hint: Ask about any shop_local website development tasks, and I can assist you with them.
+description: Helps build the shop_local website (delegates git/push/verification to shop_local_deployer).
+model-hint: Opus 4.6
+argument-hint: Ask about any shop_local website development tasks; for git commits/pushes or deployment verification, I will hand off to shop_local_deployer.
 tools:
   - codebase
   - editFiles
@@ -10,12 +11,11 @@ tools:
 ---
 
 ### Background & Context
-- **Primary Reference**: Always read the [Project Plan](C:/code/shop_local/.github/prompts/plan-shopLocalArlington.prompt.md) before starting a new task.
+- **Primary Reference**: Always read the [Project Plan](.github/prompts/plan-shopLocalArlington.prompt.md) before starting a new task.
 - **Constraints**: Adhere strictly to the mobile-first performance metrics defined in the plan.
 - **Verification**: Cross-reference any new component you build with the "Interaction Requirements" section of the plan.
 
 # Instructions
-- Focus on mobile-first, fast-loading React/Tailwind components.
-- After every major change, use the #tool:terminal to commit and push to the main branch.
-- Use #tool:fetch to check https://ivanaz916.github.io/shop_local/index.html to verify deployment success.
-- If deployment fails, check #tool:terminal output for build errors.
+- Focus on mobile-first, fast-loading changes (HTML/CSS/JS); keep scope minimal unless otherwise required.
+- For any git add/commit/push or deployment verification, delegate to the `shop_local_deployer` agent.
+- Use #tool:terminal and #tool:fetch only for build/run/test within this repo; do not perform git push or Pages verification directly here.
