@@ -1,64 +1,44 @@
 # agentic_workflow
 Agents to assist with workflow
 
-## Facebook Marketplace Screenshot Tool
+## Current Scope
 
-Automatically captures daily screenshots of Facebook Marketplace listings in Arlington, MA.
+This repository currently contains one-off and utility scripts for lease document workflows (PDF and DOCX), plus inspection helpers used during editing/debugging.
 
-### Setup
+## Environment
+
+Most scripts use Python 3 and one or both of these packages:
+
+- PyMuPDF (`fitz`) for PDF inspection and in-place text/redaction updates
+- python-docx for DOCX inspection and paragraph-level edits
+
+Install commonly used dependencies:
 
 ```bash
-cd marketplace_screenshots
-pip install -r requirements.txt
-playwright install chromium
+pip install pymupdf python-docx
 ```
 
-### Usage
+## Scripts
 
-**Take screenshots now (one-time run):**
-```bash
-python marketplace_screenshots/screenshot_marketplace.py
-```
+### PDF-focused
 
-**Force a re-run (even if already ran today):**
-```bash
-python marketplace_screenshots/screenshot_marketplace.py --force
-```
+- `compare_pdfs.py`: compares text content between two PDFs and reports differences.
+- `inspect_lease.py`: inspects target text positions in a lease PDF.
+- `inspect_underlines.py`: inspects underline glyph/position details in a PDF.
+- `remove_underscores.py`: removes underscore characters in target PDF regions.
+- `reinsert_1900.py`: reinserts the value `1,900` after underscore cleanup.
+- `update_lease.py`: applies targeted value/date edits in a lease PDF.
+- `revert_section3.py`: reverts Section 3 values/content in a modified lease PDF.
 
-**Run on a daily schedule (keeps running in background):**
-```bash
-python marketplace_screenshots/screenshot_marketplace.py --schedule
-```
+### DOCX-focused
 
-**Specify a custom time (24-hour format):**
-```bash
-python marketplace_screenshots/screenshot_marketplace.py --schedule --time 08:30
-```
+- `inspect_docx.py`: basic DOCX paragraph inspection.
+- `inspect_docx2.py`: detailed text/run inspection for clause paragraphs.
+- `inspect_docx3.py`: clause XML and run/property inspection.
+- `inspect_docx4.py`: numbering (`numPr`) checks for clause paragraphs.
+- `add_grills_clause.py`: inserts a "GRILLS" clause using the existing document structure.
 
-**Custom output directory:**
-```bash
-python marketplace_screenshots/screenshot_marketplace.py --output-dir /path/to/folder
-```
+## Notes
 
-### Alternative: Use cron (Linux/macOS)
-
-Add to your crontab (`crontab -e`) for a daily run at 9 AM:
-```
-0 9 * * * cd /path/to/agentic_workflow && python marketplace_screenshots/screenshot_marketplace.py
-```
-
-### Output
-
-Screenshots are saved to `marketplace_screenshots/screenshots/` by default, with filenames like:
-```
-marketplace_arlington_ma_2024-01-15_09-00-00_page1.png
-marketplace_arlington_ma_2024-01-15_09-00-00_page2.png
-marketplace_arlington_ma_2024-01-15_09-00-00_full.png
-```
-
-### Notes
-
-- The script runs only once per day by default (tracks last run date in `.last_run` file)
-- Uses headless Chromium browser via Playwright
-- Facebook may require login for some content — the script captures whatever is publicly visible
-- Screenshots include multiple scroll positions plus a full-page capture
+- Scripts are task-specific and may contain hard-coded local paths.
+- Review input/output paths in each script before running.
