@@ -52,12 +52,14 @@ def mark_as_ran_today():
         f.write(str(date.today()))
 
 
-def take_marketplace_screenshots(output_dir: str = SCREENSHOTS_DIR) -> list[str]:
+def take_marketplace_screenshots(output_dir: str | None = None) -> list[str]:
     """
     Navigate to Facebook Marketplace for Arlington, MA and take screenshots.
 
     Returns a list of saved screenshot file paths.
     """
+    if output_dir is None:
+        output_dir = SCREENSHOTS_DIR
     Path(output_dir).mkdir(parents=True, exist_ok=True)
 
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
@@ -127,14 +129,14 @@ def take_marketplace_screenshots(output_dir: str = SCREENSHOTS_DIR) -> list[str]
     return saved_files
 
 
-def run_once(force: bool = False):
+def run_once(force: bool = False, output_dir: str | None = None):
     """Run the screenshot capture once, respecting the once-per-day limit."""
     if not force and already_ran_today():
         logger.info("Already ran today. Use --force to override.")
         return
 
     logger.info("Starting Facebook Marketplace screenshot capture...")
-    files = take_marketplace_screenshots()
+    files = take_marketplace_screenshots(output_dir=output_dir)
 
     if files:
         mark_as_ran_today()
@@ -145,17 +147,17 @@ def run_once(force: bool = False):
         logger.warning("No screenshots were captured.")
 
 
-def run_scheduled(run_time: str = "09:00"):
+def run_scheduled(run_time: str = "09:00", output_dir: str | None = None):
     """Run the screenshot task on a daily schedule."""
     import schedule
     import time
 
     logger.info(f"Scheduling daily screenshots at {run_time}...")
 
-    schedule.every().day.at(run_time).do(run_once)
+    schedule.every().day.at(run_time).do(run_once, output_dir=output_dir)
 
     # Also run immediately if not already run today
-    run_once()
+    run_once(output_dir=output_dir)
 
     while True:
         schedule.run_pending()
@@ -191,13 +193,12 @@ def main():
 
     args = parser.parse_args()
 
-    global SCREENSHOTS_DIR
-    SCREENSHOTS_DIR = args.output_dir
+    output_dir = args.output_dir
 
     if args.schedule:
-        run_scheduled(args.time)
+        run_scheduled(args.time, output_dir=output_dir)
     else:
-        run_once(force=args.force)
+        run_once(force=args.force, output_dir=output_dir)
 
 
 if __name__ == "__main__":
